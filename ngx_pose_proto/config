@@ -1,0 +1,5 @@
+ngx_addon_name=ngx_http_pose_module
+
+HTTP_MODULES="$HTTP_MODULES ngx_http_pose_module"
+NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_pose_proto.h"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_pose_proto.c $ngx_addon_dir/ngx_http_pose_module.cpp"
