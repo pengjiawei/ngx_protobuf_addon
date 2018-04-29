@@ -1,5 +1,0 @@
-ngx_addon_name=ngx_query_proto_module
-
-HTTP_MODULES="$HTTP_MODULES ngx_query_proto_module"
-NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_query_proto.h"
-NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_query_proto.c"
