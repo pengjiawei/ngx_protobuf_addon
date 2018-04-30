@@ -1,5 +1,29 @@
 ngx_addon_name=ngx_protobuf_module
 
 CORE_MODULES="$CORE_MODULES ngx_protobuf_module"
-NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_protobuf.h"
-NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_protobuf.c"
+NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_protobuf/ngx_protobuf.h"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_protobuf/ngx_protobuf.c"
+
+
+ngx_addon_name=ngx_http_pose_module
+HTTP_MODULES="$HTTP_MODULES ngx_http_pose_module"
+NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_pose_proto/ngx_pose_proto.h"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_pose_proto/ngx_pose_proto.c $ngx_addon_dir/ngx_pose_proto/ngx_http_pose_module.cpp"
+
+
+ngx_addon_name=ngx_http_mymap_module
+HTTP_MODULES="$HTTP_MODULES ngx_http_mymap_module"
+NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_map_proto/ngx_map_proto.h"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_map_proto/ngx_map_proto.c $ngx_addon_dir/ngx_map_proto/ngx_http_mymap_module.cpp"
+
+
+ngx_addon_name=ngx_http_control_module
+HTTP_MODULES="$HTTP_MODULES ngx_http_control_module"
+NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_control_proto/ngx_control_proto.h"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_control_proto/ngx_control_proto.c $ngx_addon_dir/ngx_control_proto/ngx_http_control_module.cpp"
+
+
+ngx_addon_name=ngx_http_query_module
+HTTP_MODULES="$HTTP_MODULES ngx_http_query_module"
+NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_query_proto/ngx_query_proto.h"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_query_proto/ngx_query_proto.c $ngx_addon_dir/ngx_query_proto/ngx_http_query_module.cpp"
