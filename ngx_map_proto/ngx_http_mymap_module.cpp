@@ -246,7 +246,6 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
       int index = j + i * width;
 
       if (vec_value[index] == FREE) {
-        fprintf(fout, "set free\n");
         ngx_map_cell__set_x(mapcell, j);
         ngx_map_cell__set_y(mapcell, i);
         ngx_map_cell__set_value(mapcell, NGX_MAPCELL_FREE);
