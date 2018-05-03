@@ -1,3 +1,8 @@
+#include <string>
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 extern "C" {
 #include "ngx_map_proto.h"
@@ -7,6 +12,8 @@ extern "C" {
 
 #include <stdio.h>
 #include <stdlib.h>
+
+
 static char *
 ngx_http_mymap(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 
@@ -142,7 +149,60 @@ fflush(fout);
   return rc;
 }
 
+void readPgm(std::string pgm_file_path,unsigned int& width ,unsigned int& height,std::vector<unsigned char>& value_vec){
+    int row = 0, col = 0;
+    ifstream infile(pgm_file_path.c_str());
+    stringstream ss;
+    string inputLine = "";
 
+    // First line : version
+    getline(infile,inputLine);
+    if(inputLine.compare("P5") != 0) cerr << "Version error" << endl;
+    else cout << "Version : " << inputLine << endl;
+
+    // Second line : comment
+    getline(infile,inputLine);
+
+    while(inputLine.find("#") != string::npos){
+        cout << "Comment : " << inputLine << endl;
+        getline(infile,inputLine);
+    }
+    // Continue with a stringstream
+    ss << infile.rdbuf();
+    // Third line : size
+    stringstream wwhhss(inputLine);
+    wwhhss >> width >> height;
+    cout << width << " columns and " << height << " rows" << endl;
+
+    int array[height][width];
+
+    int max_value;
+    ss >> max_value;
+    cout <<"max value = "<<max_value<<endl;
+    unsigned char pixel;
+    // Following lines : data
+    for(row = 0; row < height; ++row){
+        for (col = 0; col < width; ++col){
+            ss >> pixel;
+            array[row][col] = pixel;
+            value_vec.push_back(pixel);
+        }
+    }
+    // Now print the array to see the result
+    // FILE* file = fopen("/home/pengjiawei/pixels.log","a");
+    // for(row = 0; row < height; ++row) {
+    //     for(col = 0; col < width; ++col) {
+    //         fprintf(file,"%d\n",array[row][col]);
+    //     }
+    // }
+    // fclose(file);
+
+    infile.close();
+}
+
+//pgm value
+const unsigned char FREE = 255;
+const unsigned char OBSTACLE = 0; 
 static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
 {
     //必须是GET或者HEAD方法，否则返回405 Not Allowed
@@ -150,7 +210,6 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
     {
         return NGX_HTTP_NOT_ALLOWED;
     }
-
     //丢弃请求中的包体
     ngx_int_t rc = ngx_http_discard_request_body(r);
     if (rc != NGX_OK)
@@ -163,9 +222,14 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
     fprintf(fout, "m->start process!\n");
     fflush(fout);
     
-
-    ngx_uint_t width = 4,height = 5;
-    ngx_uint_t mapcell_num = width * height;
+    std::string path = "/home/pengjiawei/willow-full.pgm";
+    unsigned int width;
+    unsigned int height;
+    std::vector<unsigned char> vec_value;
+    readPgm(path, width, height, vec_value);
+    fprintf(fout, "width = %d,height = %d,vec_value size = %d\n", width,height,vec_value.size());
+    fflush(fout);
+    int mapcell_num = width * height;
     // ngx_array_t* cell_array = ngx_array_create(r->pool, mapcell_num, sizeof(ngx_map_cell_t) );  
     
     fprintf(fout, "create ngx array \n");
@@ -173,17 +237,23 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
     ngx_map_t* map = ngx_map__alloc(r->pool);
 
     fflush(fout);
-    for (ngx_uint_t i = 0; i < height; ++i)
+    for (int i = 0; i < height; ++i)
     {
-      for (ngx_uint_t j = 0; j< width; ++j)
+      for (int j = 0; j< width; ++j)
       {
-      fprintf(fout, "sssssssssssssss i = %d\n",i);
       // ngx_map_cell_t* mapcell = ngx_array_push(cell_array);
       ngx_map_cell_t* mapcell = ngx_map__add__mapCell(map,r->pool);
-
+      int index = j + i * width;
       ngx_map_cell__set_x(mapcell,j);
       ngx_map_cell__set_y(mapcell,i);
-      ngx_map_cell__set_value(mapcell,NGX_MAPCELL_FREE);
+      if(vec_value[index] == FREE){
+        fprintf(fout, "set free\n");
+        ngx_map_cell__set_value(mapcell,NGX_MAPCELL_FREE);
+      }else if (vec_value[index] == OBSTACLE)
+      {
+        ngx_map_cell__set_value(mapcell,NGX_MAPCELL_OBSTACLE);
+      }
+
       }
     }
 
