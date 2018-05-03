@@ -242,15 +242,18 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
     for (int j = 0; j < width; ++j)
     {
       // ngx_map_cell_t* mapcell = ngx_array_push(cell_array);
-      ngx_map_cell_t* mapcell = ngx_map__add__mapCell(map, r->pool);
       int index = j + i * width;
 
       if (vec_value[index] == FREE) {
+      ngx_map_cell_t* mapcell = ngx_map__add__mapCell(map, r->pool);
         ngx_map_cell__set_x(mapcell, j);
         ngx_map_cell__set_y(mapcell, i);
         ngx_map_cell__set_value(mapcell, NGX_MAPCELL_FREE);
+        
       } else if (vec_value[index] == OBSTACLE)
       {
+      ngx_map_cell_t* mapcell = ngx_map__add__mapCell(map, r->pool);
+
         ngx_map_cell__set_x(mapcell, j);
         ngx_map_cell__set_y(mapcell, i);
         ngx_map_cell__set_value(mapcell, NGX_MAPCELL_OBSTACLE);
