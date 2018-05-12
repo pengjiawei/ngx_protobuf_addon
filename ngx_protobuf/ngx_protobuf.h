@@ -1,10 +1,10 @@
 #ifndef _NGX_PROTOBUF_H_INCLUDED_
 #define _NGX_PROTOBUF_H_INCLUDED_
-
+extern "C"{
 #include <stdint.h>
 #include <endian.h>
 #include <ngx_core.h>
-
+}
 /* wire types */
 
 typedef enum {

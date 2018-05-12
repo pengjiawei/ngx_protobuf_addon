@@ -1,6 +1,7 @@
+extern "C"{
 #include <ngx_core.h>
 #include "ngx_protobuf.h"
-
+}
 static char *ngx_protobuf_init(ngx_cycle_t *cycle, void *conf);
 
 static ngx_core_module_t ngx_protobuf_module_ctx = {

@@ -2,7 +2,7 @@
 
 #ifndef _NGX_CONTROL_PROTO_H_INCLUDED_
 #define _NGX_CONTROL_PROTO_H_INCLUDED_
-
+extern "C"{
 #include <stdint.h>
 #include <ngx_config.h>
 // #include <ngx_string.h>
@@ -10,7 +10,7 @@
 // #include <ngx_palloc.h>
 // #include <ngx_rbtree.h>
 #include <ngx_protobuf.h>
-
+}
 /* ControlCode */
 
 typedef struct {
