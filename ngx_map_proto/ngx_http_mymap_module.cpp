@@ -230,8 +230,8 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
   sgbot::Map2D map2d;
 
   if(map_cli->call(map2d)){
-  unsigned int width = map.getWidth();
-  unsigned int height = map.getHeight();;
+  unsigned int width = map2d.getWidth();
+  unsigned int height = map2d.getHeight();;
   // std::vector<unsigned char> vec_value;
   // readPgm(path, width, height, vec_value);
   fprintf(fout, "width = %d,height = %d", width, height);
