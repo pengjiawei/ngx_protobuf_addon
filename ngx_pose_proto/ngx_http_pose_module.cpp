@@ -1,4 +1,5 @@
-
+#include <SeNaviCommon/Service/Client.h>
+#include <type/pose2d.h>
 extern "C" {
 
 #include <ngx_config.h>
@@ -14,7 +15,7 @@ ngx_http_pose(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 static ngx_int_t ngx_http_pose_handler(ngx_http_request_t *r);
 
 }
-#include <SeNaviCommon/Service/Client.h>
+
 using namespace std;
 
 static ngx_command_t ngx_http_pose_commands[] =
