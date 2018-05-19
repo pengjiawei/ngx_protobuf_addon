@@ -14,6 +14,7 @@ ngx_http_pose(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 static ngx_int_t ngx_http_pose_handler(ngx_http_request_t *r);
 
 }
+#include <SeNaviCommon/Service/Client.h>
 using namespace std;
 
 static ngx_command_t ngx_http_pose_commands[] =
@@ -157,10 +158,18 @@ static ngx_int_t ngx_http_pose_handler(ngx_http_request_t *r) {
     fflush(fout);
 
     ngx_pose_t *pose = ngx_pose__alloc(r->pool);
-    fprintf(fout, "construct_pose\n");
-    ngx_pose__set_x(pose, 1);
-    ngx_pose__set_y(pose, 2);
+    NS_Service::Client<sgbot::Pose2D>* pose_cli = new NS_Service::Client<sgbot::Pose2D>("OCC_POSE");
+    sgbot::Pose2D occ_pose;
+    if(pose_cli->call(occ_pose)){
+        fprintf(fout, "construct_pose x = %d,y = %d\n",occ_pose.x(),occ_pose.y());
+        ngx_pose__set_x(pose, occ_pose.x());
+        ngx_pose__set_y(pose, occ_pose.y());  
+    }else{
+        fprintf(fout, "call pose failed\n");
+        return -1;
+    }
 
+    delete pose_cli;
     fprintf(fout, "pose has x = %d,has y =%d,size = %d\n", pose->__has_x, pose->__has_y, ngx_pose__size(pose));
     ngx_str_t str = ngx_null_string;
     ngx_str_t *output = &str;

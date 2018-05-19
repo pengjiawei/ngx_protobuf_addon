@@ -222,12 +222,16 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
   fprintf(fout, "m->start process!\n");
   fflush(fout);
 
-  std::string path = "/home/pengjiawei/willow-full.pgm";
-  unsigned int width;
-  unsigned int height;
-  std::vector<unsigned char> vec_value;
-  readPgm(path, width, height, vec_value);
-  fprintf(fout, "width = %d,height = %d,vec_value size = %d\n", width, height, vec_value.size());
+  // std::string path = "/tmp/gmap.pgm";
+  NS_Service::Client< sgbot::Map2D >* map_cli = new NS_Service::Client<sgbot::Map2D>("MAP");
+  sgbot::Map2D map2d;
+
+  if(map_cli->call(map2d)){
+  unsigned int width = map.getWidth();
+  unsigned int height = map.getHeight();;
+  // std::vector<unsigned char> vec_value;
+  // readPgm(path, width, height, vec_value);
+  fprintf(fout, "width = %d,height = %d", width, height);
   fflush(fout);
   int mapcell_num = width * height;
   // ngx_array_t* cell_array = ngx_array_create(r->pool, mapcell_num, sizeof(ngx_map_cell_t) );
@@ -237,20 +241,19 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
   ngx_map_t* map = ngx_map__alloc(r->pool);
 
   fflush(fout);
+
   for (int i = 0; i < height; ++i)
   {
     for (int j = 0; j < width; ++j)
     {
       // ngx_map_cell_t* mapcell = ngx_array_push(cell_array);
-      int index = j + i * width;
-
-      if (vec_value[index] == FREE) {
+      if (map2d.getPoint(i,j) == sgbot::KNOWN_MAP_POINT) {
       ngx_map_cell_t* mapcell = ngx_map__add__mapCell(map, r->pool);
         ngx_map_cell__set_x(mapcell, j);
         ngx_map_cell__set_y(mapcell, i);
         ngx_map_cell__set_value(mapcell, NGX_MAPCELL_FREE);
         
-      } else if (vec_value[index] == OBSTACLE)
+      } else if (map2d.getPoint(i,j) == sgbot::OBSTACLE_MAP_POINT)
       {
       ngx_map_cell_t* mapcell = ngx_map__add__mapCell(map, r->pool);
 
@@ -258,9 +261,38 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
         ngx_map_cell__set_y(mapcell, i);
         ngx_map_cell__set_value(mapcell, NGX_MAPCELL_OBSTACLE);
       }
-
     }
   }
+
+  }else{
+    fprintf(fout, "call map 2d failed \n");
+  }
+  delete map_cli;
+
+  // for (int i = 0; i < height; ++i)
+  // {
+  //   for (int j = 0; j < width; ++j)
+  //   {
+  //     // ngx_map_cell_t* mapcell = ngx_array_push(cell_array);
+  //     int index = j + i * width;
+
+  //     if (vec_value[index] == FREE) {
+  //     ngx_map_cell_t* mapcell = ngx_map__add__mapCell(map, r->pool);
+  //       ngx_map_cell__set_x(mapcell, j);
+  //       ngx_map_cell__set_y(mapcell, i);
+  //       ngx_map_cell__set_value(mapcell, NGX_MAPCELL_FREE);
+        
+  //     } else if (vec_value[index] == OBSTACLE)
+  //     {
+  //     ngx_map_cell_t* mapcell = ngx_map__add__mapCell(map, r->pool);
+
+  //       ngx_map_cell__set_x(mapcell, j);
+  //       ngx_map_cell__set_y(mapcell, i);
+  //       ngx_map_cell__set_value(mapcell, NGX_MAPCELL_OBSTACLE);
+  //     }
+
+  //   }
+  // }
 
   fprintf(fout, "ngx map size = %d\n", ngx_map__size(map) );
 
