@@ -229,9 +229,12 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
   NS_Service::Client< sgbot::Map2D >* map_cli = new NS_Service::Client<sgbot::Map2D>("MAP");
   sgbot::Map2D map2d;
 
+  unsigned int width;
+  unsigned int height;
+  ngx_map_t* map = ngx_map__alloc(r->pool);
   if(map_cli->call(map2d)){
-  unsigned int width = map2d.getWidth();
-  unsigned int height = map2d.getHeight();;
+  width = map2d.getWidth();
+  height = map2d.getHeight();
   // std::vector<unsigned char> vec_value;
   // readPgm(path, width, height, vec_value);
   fprintf(fout, "width = %d,height = %d", width, height);
@@ -241,7 +244,7 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
 
   fprintf(fout, "create ngx array \n");
   fprintf(fout, "construct_map\n");
-  ngx_map_t* map = ngx_map__alloc(r->pool);
+  
 
   fflush(fout);
 
