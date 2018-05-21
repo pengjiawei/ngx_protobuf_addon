@@ -226,7 +226,7 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
   fflush(fout);
 
   // std::string path = "/tmp/gmap.pgm";
-  NS_Service::Client< sgbot::Map2D >* map_cli = new NS_Service::Client<sgbot::Map2D>("MAP");
+  NS_Service::Client< sgbot::Map2D >* map_cli = new NS_Service::Client<sgbot::Map2D>("DISPLAY_MAP");
   sgbot::Map2D map2d;
 
   unsigned int width;
@@ -242,7 +242,6 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
   int mapcell_num = width * height;
   // ngx_array_t* cell_array = ngx_array_create(r->pool, mapcell_num, sizeof(ngx_map_cell_t) );
 
-  fprintf(fout, "create ngx array \n");
   fprintf(fout, "construct_map\n");
   
 
@@ -253,13 +252,13 @@ static ngx_int_t ngx_http_mymap_handler(ngx_http_request_t *r)
     for (int j = 0; j < width; ++j)
     {
       // ngx_map_cell_t* mapcell = ngx_array_push(cell_array);
-      if (map2d.getPoint(i,j) == sgbot::KNOWN_MAP_POINT) {
+      if (map2d.getPoint(j,i) == sgbot::KNOWN_MAP_POINT) {
       ngx_map_cell_t* mapcell = ngx_map__add__mapCell(map, r->pool);
         ngx_map_cell__set_x(mapcell, j);
         ngx_map_cell__set_y(mapcell, i);
         ngx_map_cell__set_value(mapcell, NGX_MAPCELL_FREE);
         
-      } else if (map2d.getPoint(i,j) == sgbot::OBSTACLE_MAP_POINT)
+      } else if (map2d.getPoint(j,i) == sgbot::OBSTACLE_MAP_POINT)
       {
       ngx_map_cell_t* mapcell = ngx_map__add__mapCell(map, r->pool);
 

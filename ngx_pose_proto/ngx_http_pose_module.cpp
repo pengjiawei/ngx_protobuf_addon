@@ -159,12 +159,12 @@ static ngx_int_t ngx_http_pose_handler(ngx_http_request_t *r) {
     fflush(fout);
 
     ngx_pose_t *pose = ngx_pose__alloc(r->pool);
-    NS_Service::Client<sgbot::Pose2D>* pose_cli = new NS_Service::Client<sgbot::Pose2D>("OCC_POSE");
+    NS_Service::Client<sgbot::Pose2D>* pose_cli = new NS_Service::Client<sgbot::Pose2D>("DISPLAY_POSE");
     sgbot::Pose2D occ_pose;
-    if(pose_cli->call(occ_pose)){
-        fprintf(fout, "construct_pose x = %.4f,y = %.4f\n",occ_pose.x(),occ_pose.y());
-        ngx_pose__set_x(pose, occ_pose.x());
-        ngx_pose__set_y(pose, occ_pose.y());  
+    if(pose_cli->call(display_pose)){
+        fprintf(fout, "construct_pose x = %.4f,y = %.4f\n",display_pose.x(),display_pose.y());
+        ngx_pose__set_x(pose, display_pose.x());
+        ngx_pose__set_y(pose, display_pose.y());  
     }else{
         fprintf(fout, "call pose failed\n");
         return -1;
