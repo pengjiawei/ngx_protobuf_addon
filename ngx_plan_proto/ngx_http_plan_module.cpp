@@ -1,31 +1,31 @@
-#include <SeNaviCommon/Service/Client.h>
-#include <type/pose2d.h>
-extern "C" {
 
+extern "C" {
+#include "ngx_plan_proto.h"
 #include <ngx_config.h>
 #include <ngx_core.h>
 #include <ngx_http.h>
 
-#include "ngx_pose_proto.h"
 #include <stdio.h>
 #include <stdlib.h>
-static char *
-ngx_http_pose(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
+#include <math.h>
+#include <time.h>
 
-static ngx_int_t ngx_http_pose_handler(ngx_http_request_t *r);
+static char *
+ngx_http_plan(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
+
+static ngx_int_t ngx_http_plan_handler(ngx_http_request_t *r);
 
 }
-
 using namespace std;
 
-static ngx_command_t ngx_http_pose_commands[] =
+static ngx_command_t ngx_http_plan_commands[] =
         {
 
                 {
-                        ngx_string("pose"),
+                        ngx_string("plan"),
                         NGX_HTTP_MAIN_CONF | NGX_HTTP_SRV_CONF | NGX_HTTP_LOC_CONF | NGX_HTTP_LMT_CONF |
                         NGX_CONF_NOARGS,
-                        ngx_http_pose,
+                        ngx_http_plan,
                         NGX_HTTP_LOC_CONF_OFFSET,
                         0,
                         NULL
@@ -34,7 +34,7 @@ static ngx_command_t ngx_http_pose_commands[] =
                 ngx_null_command
         };
 
-static ngx_http_module_t ngx_http_pose_module_ctx =
+static ngx_http_module_t ngx_http_plan_module_ctx =
         {
                 NULL,                              /* preconfiguration */
                 NULL,                       /* postconfiguration */
@@ -49,11 +49,11 @@ static ngx_http_module_t ngx_http_pose_module_ctx =
                 NULL                    /* merge location configuration */
         };
 
-ngx_module_t ngx_http_pose_module =
+ngx_module_t ngx_http_plan_module =
         {
                 NGX_MODULE_V1,
-                &ngx_http_pose_module_ctx,           /* module context */
-                ngx_http_pose_commands,              /* module directives */
+                &ngx_http_plan_module_ctx,           /* module context */
+                ngx_http_plan_commands,              /* module directives */
                 NGX_HTTP_MODULE,                       /* module type */
                 NULL,                                  /* init master */
                 NULL,                                  /* init module */
@@ -67,7 +67,7 @@ ngx_module_t ngx_http_pose_module =
 
 
 static char *
-ngx_http_pose(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
+ngx_http_plan(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
     ngx_http_core_loc_conf_t *clcf;
 
     //首先找到mytest配置项所属的配置块，clcf貌似是location块内的数据
@@ -78,16 +78,16 @@ ngx_http_pose(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) {
     //http框架在处理用户请求进行到NGX_HTTP_CONTENT_PHASE阶段时，如果
 //请求的主机域名、URI与mytest配置项所在的配置块相匹配，就将调用我们
 //实现的ngx_http_mytest_handler方法处理这个请求
-    clcf->handler = ngx_http_pose_handler;
+    clcf->handler = ngx_http_plan_handler;
 
     return NGX_CONF_OK;
 }
 
-ngx_pose_t *unpack_pose(ngx_str_t *val, ngx_pool_t *pool) {
+ngx_plan_t *unpack_plan(ngx_str_t *val, ngx_pool_t *pool) {
     ngx_protobuf_context_t ctx;
-    ngx_pose_t *pose;
-    pose = ngx_pose__alloc(pool);
-    if (pose == NULL) {
+    ngx_plan_t *plan;
+    plan = ngx_plan__alloc(pool);
+    if (plan == NULL) {
         return NULL;
     }
     ctx.pool = pool;
@@ -96,28 +96,27 @@ ngx_pose_t *unpack_pose(ngx_str_t *val, ngx_pool_t *pool) {
     ctx.buffer.last = val->data + val->len;
     ctx.reuse_strings = 1;
 
-    if (ngx_pose__unpack(pose, &ctx) != NGX_OK) {
+    if (ngx_plan__unpack(plan, &ctx) != NGX_OK) {
         return NULL;
     }
-    return pose;
+    return plan;
 }
 
-ngx_int_t pack_pose(ngx_pose_t *pose, ngx_str_t *output, ngx_pool_t *pool, FILE *file) {
+ngx_int_t pack_plan(ngx_plan_t *plan, ngx_str_t *output, ngx_pool_t *pool, FILE *file) {
     FILE *fout;
     fout = fopen("/tmp/nginx_pack_log", "a+tc");
-    fprintf(fout, "in pack pose!\n");
+    fprintf(fout, "in pack plan!\n");
     fflush(fout);
     ngx_protobuf_context_t ctx;
     size_t size;
     ngx_int_t rc;
 
-    fprintf(fout, "pose x = %d\n", pose->x);
     fflush(fout);
-    size = ngx_pose__size(pose);
+    size = ngx_plan__size(plan);
     if (size == 0) {
         return NGX_DECLINED;
     }
-    fprintf(fout, "pose size = %d\n", size);
+    fprintf(fout, "plan size = %d\n", size);
     fflush(fout);
     output->data = ngx_palloc(pool, size);
     if (output->data == NULL) {
@@ -131,7 +130,7 @@ ngx_int_t pack_pose(ngx_pose_t *pose, ngx_str_t *output, ngx_pool_t *pool, FILE 
     ctx.buffer.pos = ctx.buffer.start;
     ctx.buffer.last = ctx.buffer.start + size;
 
-    rc = ngx_pose__pack(pose, &ctx);
+    rc = ngx_plan__pack(plan, &ctx);
 
     output->len = ctx.buffer.pos - ctx.buffer.start;
     u_char cc = *(output->data + output->len);
@@ -141,7 +140,8 @@ ngx_int_t pack_pose(ngx_pose_t *pose, ngx_str_t *output, ngx_pool_t *pool, FILE 
 }
 
 
-static ngx_int_t ngx_http_pose_handler(ngx_http_request_t *r) {
+
+static ngx_int_t ngx_http_plan_handler(ngx_http_request_t *r) {
     //必须是GET或者HEAD方法，否则返回405 Not Allowed
     if (!(r->method & (NGX_HTTP_GET | NGX_HTTP_HEAD))) {
         return NGX_HTTP_NOT_ALLOWED;
@@ -154,30 +154,27 @@ static ngx_int_t ngx_http_pose_handler(ngx_http_request_t *r) {
     }
 
     FILE *fout;
-    fout = fopen("/tmp/nginx_pose_log", "a+tc");
+    fout = fopen("/tmp/nginx_plan_log", "a+tc");
     fprintf(fout, "m->start process!\n");
+
+
     fflush(fout);
 
-    ngx_pose_t *pose = ngx_pose__alloc(r->pool);
-    NS_Service::Client<sgbot::Pose2D>* pose_cli = new NS_Service::Client<sgbot::Pose2D>("DISPLAY_POSE");
-    sgbot::Pose2D display_pose;
-    if(pose_cli->call(display_pose)){
-        fprintf(fout, "construct_pose x = %.4f,y = %.4f\n",display_pose.x(),display_pose.y());
-        ngx_pose__set_x(pose, display_pose.x());
-        ngx_pose__set_y(pose, display_pose.y());  
-    }else{
-        fprintf(fout, "call pose failed\n");
-        fflush(fout);
-        return -1;
+    ngx_plan_t *plan = ngx_plan__alloc(r->pool);
+    //range need to be vector size 
+    for(int i = 0; i < 1;++i){
+        ngx_point_t* point = ngx_plan__add__point(plan, r->pool);
+        ngx_point__set_x(point, 512);
+        ngx_point__set_y(point, 512);
     }
+    fprintf(fout, "construct_plan\n");
 
-    delete pose_cli;
-    fprintf(fout, "pose has x = %d,has y =%d,size = %d\n", pose->__has_x, pose->__has_y, ngx_pose__size(pose));
+
     ngx_str_t str = ngx_null_string;
     ngx_str_t *output = &str;
-    fprintf(fout, "pack pose\n");
+    fprintf(fout, "pack plan\n");
     fflush(fout);
-    pack_pose(pose, output, r->pool, fout);
+    pack_plan(plan, output, r->pool, fout);
 
 
     ngx_str_t test_t = ngx_string("hello, this is nginx");
