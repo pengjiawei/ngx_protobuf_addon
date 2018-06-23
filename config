@@ -31,3 +31,8 @@ ngx_addon_name=ngx_http_plan_module
 HTTP_MODULES="$HTTP_MODULES ngx_http_plan_module"
 NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_plan_proto/ngx_plan_proto.h"
 NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_plan_proto/ngx_plan_proto.c $ngx_addon_dir/ngx_plan_proto/ngx_http_plan_module.cpp"
+
+ngx_addon_name=ngx_http_point_module
+HTTP_MODULES="$HTTP_MODULES ngx_http_point_module"
+NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_plan_proto/ngx_plan_proto.h"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_plan_proto/ngx_http_point_module.cpp"
