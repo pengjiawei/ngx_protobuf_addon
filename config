@@ -16,6 +16,12 @@ NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_map_proto/ngx_map_proto.h"
 NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_map_proto/ngx_map_proto.c $ngx_addon_dir/ngx_map_proto/ngx_http_mymap_module.cpp"
 
 
+ngx_addon_name=ngx_http_cover_module
+HTTP_MODULES="$HTTP_MODULES ngx_http_cover_module"
+NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_plan_proto/ngx_plan_proto.h"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_map_proto/ngx_http_cover_module.cpp"
+
+
 ngx_addon_name=ngx_http_control_module
 HTTP_MODULES="$HTTP_MODULES ngx_http_control_module"
 NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_control_proto/ngx_control_proto.h"
@@ -36,3 +42,4 @@ ngx_addon_name=ngx_http_point_module
 HTTP_MODULES="$HTTP_MODULES ngx_http_point_module"
 NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/ngx_plan_proto/ngx_plan_proto.h"
 NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_plan_proto/ngx_http_point_module.cpp"
+

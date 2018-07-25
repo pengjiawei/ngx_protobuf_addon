@@ -168,6 +168,15 @@ static ngx_int_t ngx_http_control_handler(ngx_http_request_t *r) {
 
     fprintf(fout, "opt_code = %d\n", opt_code);
 
+
+    if(opt_code == 0){
+        fprintf(fout, "execute PID\n");
+        system("SeDeamon");
+    }else if (opt_code == 1){
+        fprintf(fout, "stop PID killall\n");
+        system("killall SeDeamon");
+    }
+    
     ngx_error_code_t *error_code = ngx_control_code__alloc(r->pool);
     ngx_error_code__set_error_code(error_code, 0);
 
